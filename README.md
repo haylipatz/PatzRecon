@@ -9,7 +9,7 @@ Authorization First: The tool requires explicit target definition (URL/IP) and a
 
 # How It Works
 PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a target, it systematically fingerprints the application structure and behavior.
-<br> 1. Input: The user provides a target URL (e.g., https://acme.web-security-academy.net/) and optional credentials or session cookies.
+<br>1. Input: The user provides a target URL (e.g., https://example.net/) and optional credentials or session cookies.
 <br>2. Orchestration: The main engine (PatzRecon.py) loads all 31 vulnerability modules.
 <br>3. Probing: Each module executes a series of non-destructive checks:
 <br>Passive Analysis: Inspects HTML source, HTTP headers, and JavaScript files for clues (e.g., X-Powered-By, CSRF tokens, CORS headers).
