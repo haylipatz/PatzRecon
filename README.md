@@ -6,3 +6,12 @@ PatzRecon is a Python-based, modular reconnaissance tool designed to assist secu
 Authorization First: The tool requires explicit target definition (URL/IP) and assumes the user has legal authority to test the target.
 <br>No False Positives (Best Effort): Probes are designed to be deterministic where possible (e.g., checking for specific headers, status codes, or known file paths) rather than relying on heuristic guesses that often lead to false positives.
 <br>Modularity: Each of the 31 PortSwigger Web Security Academy topics is handled by an independent module, allowing for easy updates and maintenance.
+
+# How It Works
+PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a target, it systematically fingerprints the application structure and behavior.
+<br> 1. Input: The user provides a target URL (e.g., https://acme.web-security-academy.net/) and optional credentials or session cookies.
+<br>2. Orchestration: The main engine (PatzRecon.py) loads all 31 vulnerability modules.
+<br>3. Probing: Each module executes a series of non-destructive checks:
+<br>Passive Analysis: Inspects HTML source, HTTP headers, and JavaScript files for clues (e.g., X-Powered-By, CSRF tokens, CORS headers).
+<br>Active Fingerprinting: Sends specific, safe requests to detect behaviors (e.g., sending a malformed JSON body to check for deserialization errors, or requesting /admin to check for access control responses).
+<br>4. Reporting: Results are aggregated into a structured report indicating which vulnerability classes are likely present based on observed indicators.
