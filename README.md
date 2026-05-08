@@ -15,3 +15,9 @@ PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a t
 <br>Passive Analysis: Inspects HTML source, HTTP headers, and JavaScript files for clues (e.g., X-Powered-By, CSRF tokens, CORS headers).
 <br>Active Fingerprinting: Sends specific, safe requests to detect behaviors (e.g., sending a malformed JSON body to check for deserialization errors, or requesting /admin to check for access control responses).
 <br>4. Reporting: Results are aggregated into a structured report indicating which vulnerability classes are likely present based on observed indicators.
+<br><br>Example Scenario:
+Target: A PortSwigger Lab ID acme123.
+Action: PatzRecon sends a request to the homepage.
+Module: SQL Injection: Checks if input parameters reflect in error messages or if specific SQL keywords trigger database errors.
+Module: CORS: Checks if the Access-Control-Allow-Origin header is set to * or reflects the Origin header improperly.
+Output: "Potential SQL Injection detected in 'productId' parameter. CORS misconfiguration identified."
