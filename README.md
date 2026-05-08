@@ -21,3 +21,7 @@ PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a t
 <br>Module: SQL Injection: Checks if input parameters reflect in error messages or if specific SQL keywords trigger database errors.
 <br>Module: CORS: Checks if the Access-Control-Allow-Origin header is set to * or reflects the Origin header improperly.
 <br>Output: "Potential SQL Injection detected in 'productId' parameter. CORS misconfiguration identified."
+<br>
+# Architecture: Modular Plugin System
+The project is split into a main orchestrator and independent vulnerability modules. This follows the Strategy Pattern and Plugin Architecture.
+Directory Structure
