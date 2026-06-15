@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Author : HayliPatz
 """
 SQL Injection Detection Module
 Covers: Classic SQLi, Blind SQLi, Error-based, Union-based, Time-based
