@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Author : HayliPatz
 """
 Cross-Site Scripting (XSS) Detection Module
 Covers: Reflected, Stored, DOM-based XSS
