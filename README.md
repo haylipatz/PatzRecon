@@ -25,3 +25,32 @@ PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a t
 # Architecture: Modular Plugin System
 The project is split into a main orchestrator and independent vulnerability modules. This follows the Strategy Pattern and Plugin Architecture.
 Directory Structure
+
+PatzRecon/
+├── core/
+│   ├── __init__.py
+│   ├── engine.py          # Main orchestrator
+│   ├── http_client.py      # Async HTTP handler
+│   ├── cache.py           # SQLite deduplication
+│   ├── matcher.py         # Fuzzy detection logic
+│   └── reporter.py        # Output formatting
+├── modules/               # 31 vulnerability modules
+│   ├── sqli/
+│   ├── xss/
+│   ├── csrf/
+│   ├── cors/
+│   ├── idor/
+│   └── ... (31 topics)
+├── payloads/              # YAML payload database
+│   ├── sqli.yaml
+│   ├── xss.yaml
+│   └── ...
+├── utils/
+│   ├── lab_parser.py      # PortSwigger URL parser
+│   ├── auth_handler.py    # Session management
+│   └── validators.py      # Input validation
+├── reports/               # Output directory
+├── patzrecon.py           # CLI entry point
+└── requirements.txt
+
+
