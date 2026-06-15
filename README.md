@@ -27,30 +27,30 @@ The project is split into a main orchestrator and independent vulnerability modu
 Directory Structure
 
 PatzRecon/
-├── core/
-│   ├── __init__.py
-│   ├── engine.py          # Main orchestrator
-│   ├── http_client.py      # Async HTTP handler
-│   ├── cache.py           # SQLite deduplication
-│   ├── matcher.py         # Fuzzy detection logic
-│   └── reporter.py        # Output formatting
-├── modules/               # 31 vulnerability modules
-│   ├── sqli/
-│   ├── xss/
-│   ├── csrf/
-│   ├── cors/
-│   ├── idor/
-│   └── ... (31 topics)
-├── payloads/              # YAML payload database
-│   ├── sqli.yaml
-│   ├── xss.yaml
-│   └── ...
-├── utils/
-│   ├── lab_parser.py      # PortSwigger URL parser
-│   ├── auth_handler.py    # Session management
-│   └── validators.py      # Input validation
-├── reports/               # Output directory
-├── patzrecon.py           # CLI entry point
-└── requirements.txt
+<br>├── core/
+<br>│   ├── __init__.py
+<br>│   ├── engine.py          # Main orchestrator
+<br>│   ├── http_client.py      # Async HTTP handler
+<br>│   ├── cache.py           # SQLite deduplication
+<br>│   ├── matcher.py         # Fuzzy detection logic
+<br>│   └── reporter.py        # Output formatting
+<br>├── modules/               # 31 vulnerability modules
+<br>│   ├── sqli/
+<br>│   ├── xss/
+<br>│   ├── csrf/
+<br>│   ├── cors/
+<br>│   ├── idor/
+<br>│   └── ... (31 topics)
+<br>├── payloads/              # YAML payload database
+<br>│   ├── sqli.yaml
+<br>│   ├── xss.yaml
+<br>│   └── ...
+<br>├── utils/
+<br>│   ├── lab_parser.py      # PortSwigger URL parser
+<br>│   ├── auth_handler.py    # Session management
+<br>│   └── validators.py      # Input validation
+<br>├── reports/               # Output directory
+<br>├── patzrecon.py           # CLI entry point
+<br>└── requirements.txt
 
 
