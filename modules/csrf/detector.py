@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Author : HayliPatz
 """
 CSRF Detection Module
 Identifies missing tokens, weak validation, SameSite issues
