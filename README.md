@@ -482,5 +482,20 @@ python patzrecon.py -u "https://0a7b001xxxxx.web-security-academy.net" --bscp-mo
 # 5. Or use global command (if symlink created)
 patzrecon -u "https://target.com" -o /root/reports/findings.json
 ```
-<br>The tool is now ready for use in your Kali Linux penetration testing environment alongside Burp Suite, OWASP ZAP, and other standard tools.
+The tool is now ready for use in your Kali Linux penetration testing environment alongside Burp Suite, OWASP ZAP, and other standard tools.
+<br>
+## Other Tools Weaknesses → PatzRecon Improvements
+A comprehensive, modular reconnaissance tool PatzRecon that addresses Other tools' limitations and provides robust detection for all 31 PortSwigger Web Security Academy topics without false positives.
+| Others | PatzRecon Solution |
+|-----------------|-------------------|
+| No rate limiting | Adaptive throttling with jitter |
+| Missing async/concurrency | Asyncio-based with connection pooling |
+| No false positive filtering | Fuzzy matching + confidence scoring |
+| Hardcoded payloads | External YAML-based payload DB |
+| No proxy support | Burp/OWASP ZAP proxy integration |
+| Missing lab ID parsing | Auto URL pattern recognition |
+| Single-threaded | ThreadPoolExecutor + async hybrid |
+| No authentication handling | Session cookie/JWT support |
+| Poor output formatting | JSON/CSV/HTML reports |
+| No cache mechanism | SQLite caching for duplicate prevention |
 
