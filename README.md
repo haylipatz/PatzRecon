@@ -22,40 +22,39 @@ PatzRecon operates as a "Lab-Scope Recon Aide." Instead of blindly attacking a t
 <br>Module: CORS: Checks if the Access-Control-Allow-Origin header is set to * or reflects the Origin header improperly.
 <br>Output: "Potential SQL Injection detected in 'productId' parameter. CORS misconfiguration identified."
 <br>
-# Architecture: Modular Plugin System
-The project is split into a main orchestrator and independent vulnerability modules. This follows the Strategy Pattern and Plugin Architecture.
-Directory Structure
-
+# PatzRecon Architecture
+<br>The project is split into a main orchestrator and independent vulnerability modules. This follows the Strategy Pattern and Plugin Architecture.
+<br>Directory Structure:
+```
 PatzRecon/
-<br>├── core/
-<br>│   ├── __init__.py
-<br>│   ├── engine.py          # Main orchestrator
-<br>│   ├── http_client.py      # Async HTTP handler
-<br>│   ├── cache.py           # SQLite deduplication
-<br>│   ├── matcher.py         # Fuzzy detection logic
-<br>│   └── reporter.py        # Output formatting
-<br>├── modules/               # 31 vulnerability modules
-<br>│   ├── sqli/
-<br>│   ├── xss/
-<br>│   ├── csrf/
-<br>│   ├── cors/
-<br>│   ├── idor/
-<br>│   └── ... (31 topics)
-<br>├── payloads/              # YAML payload database
-<br>│   ├── sqli.yaml
-<br>│   ├── xss.yaml
-<br>│   └── ...
-<br>├── utils/
-<br>│   ├── lab_parser.py      # PortSwigger URL parser
-<br>│   ├── auth_handler.py    # Session management
-<br>│   └── validators.py      # Input validation
-<br>├── reports/               # Output directory
-<br>├── patzrecon.py           # CLI entry point
-<br>└── requirements.txt
-
+├── core/
+│   ├── __init__.py
+│   ├── engine.py          # Main orchestrator
+│   ├── http_client.py      # Async HTTP handler
+│   ├── cache.py           # SQLite deduplication
+│   ├── matcher.py         # Fuzzy detection logic
+│   └── reporter.py        # Output formatting
+├── modules/               # 31 vulnerability modules
+│   ├── sqli/
+│   ├── xss/
+│   ├── csrf/
+│   ├── cors/
+│   ├── idor/
+│   └── ... (31 topics)
+├── payloads/              # YAML payload database
+│   ├── sqli.yaml
+│   ├── xss.yaml
+│   └── ...
+├── utils/
+│   ├── lab_parser.py      # PortSwigger URL parser
+│   ├── auth_handler.py    # Session management
+│   └── validators.py      # Input validation
+├── reports/               # Output directory
+├── patzrecon.py           # CLI entry point
+└── requirements.txt
+```
 ## Installation Guide
 <br>Step 1: Prerequisites
-
 ```
 # Python 3.8+ required
 python3 --version
@@ -91,7 +90,7 @@ rate_limit_delay: [1, 3]
 user_agent: "PatzRecon/1.0"
 min_confidence: low
 ```
-##Usage Example
+## Usage Example
 <br>Beginner Usage
 ```
 # Basic scan of a lab
@@ -172,7 +171,7 @@ findings = await engine.scan(target, selected_modules=bscp_priority_modules)
   "tryhackme_module": "SQL Injection"
 }
 ```
-##False Positive Prevention
+## False Positive Prevention
 <br>PatzRecon eliminates false positives through:
 
 <br>1. Multi-Confirmation: Requires multiple indicators
@@ -181,7 +180,7 @@ findings = await engine.scan(target, selected_modules=bscp_priority_modules)
 <br>4. Confidence Thresholding: Dismisses low-confidence results
 <br>5. Pattern Validation: Regex with strict boundaries
 
-##Kali Linux Installation Guide
+## Kali Linux Installation Guide
 
 <br>Method 1: Direct Installation (Recommended) 
 ```
@@ -398,33 +397,90 @@ tabulate>=0.9.0
 # Optional: For Windows compatibility on WSL
 dnspython>=2.3.0
 ```
-##Kali Linux Integration
+## Kali Linux Integration
 <br>Burp Suite Pro Integration
-<br>Step 3: 
 ```
+# Configure PatzRecon to use Burp
+patzrecon -u https://target.com \
+    --proxy http://127.0.0.1:8080 \
+    -o /root/patzrecon_results.json
 
+# Or set environment variable
+export HTTP_PROXY=http://127.0.0.1:8080
+export HTTPS_PROXY=http://127.0.0.1:8080
+patzrecon -u https://target.com
 ```
-<br>Step 3: 
+<br>Add to Kali Menu
+<br> Create ``` /usr/share/applications/patzrecon.desktop ```
+<br>ini
 ```
+[Desktop Entry]
+Name=PatzRecon
+Comment=Web Security Academy Reconnaissance Tool
+Exec=gnome-terminal -- /opt/patzrecon/venv/bin/python /opt/patzrecon/patzrecon.py
+Type=Application
+Terminal=true
+Icon=kali-web
+Categories=03-webapp-analysis;
+```
+<br>Refresh menu:
+```
+sudo update-desktop-database
+```
+<br>Verification Test
+```
+# Test basic functionality
+patzrecon --help
 
-```
-<br>Step 3: 
-```
+# Test on PortSwigger public lab ( intentionally vulnerable)
+patzrecon -u "https://portswigger.net" -v
 
-```
-<br>Step 3: 
-```
+# Check all modules load
+python3 -c "
+from core.engine import PatzReconEngine
+import asyncio
 
-```
-<br>Step 3: 
-```
+async def test():
+    engine = PatzReconEngine()
+    await engine.initialize()
+    print(f'Loaded {len(engine.modules)} modules')
+    print('Modules:', list(engine.modules.keys()))
+    await engine.close()
 
+asyncio.run(test())
+"
+
+# Test from virtual environment
+cd /opt/patzrecon
+source venv/bin/activate
+python patzrecon.py -u https://httpbin.org --format json
 ```
-<br>Step 3: 
+<br>Uninstall from Kali
 ```
+# Remove installation
+sudo rm -rf /opt/patzrecon
+sudo rm -f /usr/local/bin/patzrecon
+sudo rm -f /usr/share/applications/patzrecon.desktop
 
+# Remove from PATH (edit ~/.zshrc or ~/.bashrc)
+sed -i '/patzrecon/d' ~/.zshrc
+sed -i '/patzrecon/d' ~/.bashrc
 ```
+<br>Quick Start (Post-Install)
+```
+# 1. Open terminal
 
+# 2. Navigate to tool
+cd /opt/patzrecon
 
+# 3. Activate environment
+source venv/bin/activate
 
+# 4. Run against target
+python patzrecon.py -u "https://0a7b001xxxxx.web-security-academy.net" --bscp-mode
+
+# 5. Or use global command (if symlink created)
+patzrecon -u "https://target.com" -o /root/reports/findings.json
+```
+<br>The tool is now ready for use in your Kali Linux penetration testing environment alongside Burp Suite, OWASP ZAP, and other standard tools.
 
