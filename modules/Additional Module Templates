@@ -1,0 +1,242 @@
+# Module 5: Authentication Bypass (modules/auth_bypass/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect password reset functionality
+        # Identify 2FA implementation
+        # Check for weak session handling
+        return findings
+
+# Module 6: IDOR (modules/idor/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Enumerate numeric identifiers in URLs
+        # Test for predictable object references
+        # Check UUID vs sequential ID usage
+        return findings
+
+# Module 7: File Upload (modules/file_upload/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify upload endpoints
+        # Check for extension validation
+        # Detect content-type validation
+        return findings
+
+# Module 8: LFI/RFI (modules/lfi/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Test for path traversal indicators
+        # Check for file inclusion parameters
+        # Detect wrapper support (file://, php://)
+        return findings
+
+# Module 9: SSRF (modules/ssrf/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect URL parameters susceptible to SSRF
+        # Test for internal IP reflection
+        # Check cloud metadata access points
+        return findings
+
+# Module 10: XXE (modules/xxe/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify XML parsing endpoints
+        # Check for DTD processing
+        # Detect entity expansion support
+        return findings
+
+# Module 11: JWT Security (modules/jwt/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect JWT in cookies/headers
+        # Check algorithm (none/HS256/RS256)
+        # Test for weak signing
+        return findings
+
+# Module 12: OAuth Security (modules/oauth/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify OAuth endpoints
+        # Check for CSRF in OAuth flow
+        # Detect redirect_uri validation
+        return findings
+
+# Module 13: Business Logic (modules/business_logic/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Enumerate price manipulation points
+        # Check workflow sequence validation
+        # Detect negative quantity handling
+        return findings
+
+# Module 14: Information Disclosure (modules/info_disclosure/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Check for stack traces
+        # Identify debug endpoints
+        # Detect backup file exposure
+        return findings
+
+# Module 15: Access Control (modules/access_control/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Enumerate admin endpoints
+        # Check for unauthenticated access
+        # Test horizontal/vertical escalation
+        return findings
+
+# Module 16: Deserialization (modules/deserialization/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect serialized objects in cookies
+        # Check for Java/Python/PHP deserialization markers
+        # Identify deserialization endpoints
+        return findings
+
+# Module 17: Race Conditions (modules/race_condition/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify coupon redemption endpoints
+        # Check for balance transfer operations
+        # Detect concurrent processing indicators
+        return findings
+
+# Module 18: Host Header Injection (modules/host_header/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Test for password reset poisoning
+        # Check for cache poisoning potential
+        # Detect routing-based attacks
+        return findings
+
+# Module 19: HTTP Request Smuggling (modules/request_smuggling/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect CL.TE or TE.CL vulnerabilities
+        # Identify front-end/backend desync
+        # Check for timeout differential
+        return findings
+
+# Module 20: Web Cache Deception (modules/cache_deception/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify cache behavior
+        # Test for path confusion
+        # Check for extension-based caching
+        return findings
+
+# Module 21: GraphQL Security (modules/graphql/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect GraphQL endpoints
+        # Check for introspection
+        # Identify batch query support
+        return findings
+
+# Module 22: WebSocket Security (modules/websocket/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify WebSocket endpoints
+        # Check for authentication
+        # Detect message validation
+        return findings
+
+# Module 23: Prototype Pollution (modules/prototype_pollution/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect JavaScript object merging
+        # Check for __proto__ pollution
+        # Test constructor.prototype
+        return findings
+
+# Module 24: SSTI (modules/ssti/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify template engines
+        # Test for expression evaluation
+        # Check for Jinja/Twig/etc indicators
+        return findings
+
+# Module 25: NoSQL Injection (modules/nosql_injection/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect MongoDB injection points
+        # Check for operator injection ($ne, $gt)
+        # Test JSON parameter parsing
+        return findings
+
+# Module 26: API Security (modules/api_security/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify API endpoints
+        # Check for rate limiting
+        # Detect versioning issues
+        return findings
+
+# Module 27: DOM-based Vulnerabilities (modules/dom_vulnerabilities/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Analyze client-side JavaScript
+        # Check for postMessage handlers
+        # Detect严格控制 errors
+        return findings
+
+# Module 28: Clickjacking (modules/clickjacking/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Check for X-Frame-Options
+        # Test for frame-busting scripts
+        # Check Content-Security-Policy
+        return findings
+
+# Module 29: XML Security (modules/xml_security/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Check for XML entity expansion
+        # Detect XInclude support
+        # Test for XSLT processing
+        return findings
+
+# Module 30: LDAP Injection (modules/ldap_injection/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Detect LDAP search filters
+        # Check for authentication bypass
+        # Test for directory traversal
+        return findings
+
+# Module 31: Command Injection (modules/command_injection/detector.py)
+class Detector(BaseDetector):
+    async def scan(self, target) -> List[Finding]:
+        findings = []
+        # Identify command execution points
+        # Check for shell metacharacters
+        # Detect error-based indicators
+        return findings
