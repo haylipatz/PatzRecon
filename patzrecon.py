@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Author : HayliPatz
 """
 PatzRecon - Web Security Academy Reconnaissance Tool
 Entry point for command-line interface
