@@ -55,11 +55,5 @@ PatzRecon/
 
 # Installation Guide
 
-# Python 3.8+ required
-python3 --version
-
-# Install pip if needed
-sudo apt-get install python3-pip  # Debian/Ubuntu
-brew install python3              # macOS
 
 
