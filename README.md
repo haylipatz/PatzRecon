@@ -204,7 +204,7 @@ sudo chown $(whoami):$(whoami) /opt/patzrecon
 cd /opt/patzrecon
 
 # Step 4: Clone repository (or extract archive)
-# git clone https://github.com/yourrepo/patzrecon.git .
+# git clone https://github.com/haylipatz/patzrecon.git .
 # OR if you have the archive:
 # tar -xzf patzrecon.tar.gz -C /opt/patzrecon
 
