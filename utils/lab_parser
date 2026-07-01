@@ -1,0 +1,528 @@
+#!/usr/bin/env python3
+"""
+PortSwigger Lab URL Parser
+Extracts lab IDs and identifies lab types from PortSwigger URLs
+"""
+
+import re
+from urllib.parse import urlparse
+from typing import Dict, Optional, List
+from dataclasses import dataclass
+
+
+@dataclass
+class LabInfo:
+    """Structured lab information"""
+    lab_id: str
+    lab_type: str
+    category: str
+    difficulty: str
+    base_url: str
+    is_portswigger: bool
+    raw_url: str
+
+
+class PortSwiggerLabParser:
+    """
+    Parser for PortSwigger Web Security Academy lab URLs
+    """
+    
+    # PortSwigger domain patterns
+    PORTSWIGGER_DOMAINS = [
+        'web-security-academy.net',
+        'portswigger-labs.net',
+        'portswigger.net'
+    ]
+    
+    # Lab type patterns based on URL structure and common paths
+    LAB_PATTERNS = {
+        # SQL Injection
+        'sqli': {
+            'patterns': ['sql-injection', 'sqli', 'filter-category', 'product-category'],
+            'category': 'SQL Injection',
+            'topics': [
+                'SQL injection vulnerability in WHERE clause',
+                'SQL injection vulnerability in filter',
+                'SQL injection UNION attack',
+                'Blind SQL injection',
+                'SQL injection with time delays'
+            ]
+        },
+        
+        # XSS
+        'xss': {
+            'patterns': ['cross-site-scripting', 'xss', 'reflected-xss', 'stored-xss', 'dom-xss'],
+            'category': 'Cross-site scripting (XSS)',
+            'topics': [
+                'Reflected XSS',
+                'Stored XSS',
+                'DOM XSS',
+                'XSS with AngularJS',
+                'XSS with CSP bypass'
+            ]
+        },
+        
+        # CSRF
+        'csrf': {
+            'patterns': ['csrf', 'cross-site-request-forgery'],
+            'category': 'CSRF',
+            'topics': [
+                'CSRF vulnerability with no defenses',
+                'CSRF where token validation depends on request method',
+                'CSRF where token is not tied to user session'
+            ]
+        },
+        
+        # Authentication
+        'auth': {
+            'patterns': ['authentication', 'login', 'password', '2fa', 'oauth'],
+            'category': 'Authentication',
+            'topics': [
+                'Username enumeration via different responses',
+                '2FA simple bypass',
+                'Password reset broken logic',
+                'JWT authentication bypass'
+            ]
+        },
+        
+        # Access Control
+        'access_control': {
+            'patterns': ['access-control', 'idor', 'horizontal-privilege'],
+            'category': 'Access control',
+            'topics': [
+                'Unprotected admin functionality',
+                'User ID controlled by request parameter',
+                'Multi-step process with no access control'
+            ]
+        },
+        
+        # Path Traversal
+        'path_traversal': {
+            'patterns': ['path-traversal', 'lfi', 'file-path'],
+            'category': 'Path traversal',
+            'topics': [
+                'File path traversal simple case',
+                'Traversal with absolute path bypass',
+                'Traversal with superfluous URL decode'
+            ]
+        },
+        
+        # SSRF
+        'ssrf': {
+            'patterns': ['ssrf', 'server-side-request-forgery'],
+            'category': 'SSRF',
+            'topics': [
+                'Basic SSRF against local server',
+                'SSRF with blacklist-based input filter',
+                'SSRF with filter bypass via open redirection'
+            ]
+        },
+        
+        # File Upload
+        'file_upload': {
+            'patterns': ['file-upload', 'avatar', 'upload'],
+            'category': 'File upload vulnerabilities',
+            'topics': [
+                'Remote code execution via web shell upload',
+                'Web shell upload via path traversal',
+                'Web shell upload via extension bypass'
+            ]
+        },
+        
+        # Deserialization
+        'deserialization': {
+            'patterns': ['deserialization', 'serialize', 'pickle', 'java-deserialization'],
+            'category': 'Insecure deserialization',
+            'topics': [
+                'Modifying serialized objects',
+                'PHP deserialization',
+                'Java deserialization'
+            ]
+        },
+        
+        # XXE
+        'xxe': {
+            'patterns': ['xxe', 'xml-external-entity'],
+            'category': 'XXE',
+            'topics': [
+                'Exploiting XXE using external entities',
+                'Exploiting blind XXE',
+                'XXE via file upload'
+            ]
+        },
+        
+        # CORS
+        'cors': {
+            'patterns': ['cors', 'cross-origin'],
+            'category': 'CORS',
+            'topics': [
+                'CORS vulnerability with basic origin reflection',
+                'CORS vulnerability with trusted null origin'
+            ]
+        },
+        
+        # Business Logic
+        'business_logic': {
+            'patterns': ['business-logic', 'logic-flaw', 'price-manipulation'],
+            'category': 'Business logic vulnerabilities',
+            'topics': [
+                'Excessive trust in client-side controls',
+                'High-level logic vulnerability',
+                'Inconsistent security controls'
+            ]
+        },
+        
+        # Information Disclosure
+        'info_disclosure': {
+            'patterns': ['information-disclosure', 'debug', 'error'],
+            'category': 'Information disclosure',
+            'topics': [
+                'Information disclosure in error messages',
+                'Information disclosure on debug page',
+                'Source code disclosure via backup files'
+            ]
+        },
+        
+        # JWT
+        'jwt': {
+            'patterns': ['jwt', 'json-web-token'],
+            'category': 'JWT',
+            'topics': [
+                'JWT authentication bypass via unverified signature',
+                'JWT authentication bypass via flawed signature verification'
+            ]
+        },
+        
+        # Race Conditions
+        'race_conditions': {
+            'patterns': ['race-condition', 'limit-overrun'],
+            'category': 'Race conditions',
+            'topics': [
+                'Limit overrun race conditions',
+                'Multi-endpoint race conditions'
+            ]
+        },
+        
+        # Host Header Injection
+        'host_header': {
+            'patterns': ['host-header', 'password-reset-poisoning'],
+            'category': 'Host header injection',
+            'topics': [
+                'Basic password reset poisoning',
+                'Password reset poisoning via dangling markup'
+            ]
+        },
+        
+        # OAuth
+        'oauth': {
+            'patterns': ['oauth', 'oauth-authentication'],
+            'category': 'OAuth authentication',
+            'topics': [
+                'OAuth account hijacking via redirect_uri',
+                'Forced OAuth profile linking'
+            ]
+        },
+        
+        # GraphQL
+        'graphql': {
+            'patterns': ['graphql', 'graph-ql'],
+            'category': 'GraphQL API vulnerabilities',
+            'topics': [
+                'Discovering GraphQL endpoints',
+                'Bypassing GraphQL brute force protections'
+            ]
+        },
+        
+        # WebSockets
+        'websockets': {
+            'patterns': ['websocket', 'live-chat'],
+            'category': 'WebSockets',
+            'topics': [
+                'Manipulating WebSocket messages',
+                'Cross-site WebSocket hijacking'
+            ]
+        },
+        
+        # Prototype Pollution
+        'prototype_pollution': {
+            'patterns': ['prototype-pollution', 'dom-xss'],
+            'category': 'Prototype pollution',
+            'topics': [
+                'Client-side prototype pollution',
+                'Server-side prototype pollution'
+            ]
+        },
+        
+        # SSTI
+        'ssti': {
+            'patterns': ['ssti', 'template-injection'],
+            'category': 'SSTI',
+            'topics': [
+                'Basic server-side template injection',
+                'Server-side template injection in an unfamiliar language'
+            ]
+        },
+        
+        # Request Smuggling
+        'request_smuggling': {
+            'patterns': ['request-smuggling', 'http-request-smuggling'],
+            'category': 'HTTP request smuggling',
+            'topics': [
+                'HTTP request smuggling via H2.TE request splitting',
+                'HTTP request smuggling via CRLF injection'
+            ]
+        },
+        
+        # Clickjacking
+        'clickjacking': {
+            'patterns': ['clickjacking', 'click-jacking'],
+            'category': 'Clickjacking',
+            'topics': [
+                'Basic clickjacking',
+                'Clickjacking with form input data prefilled'
+            ]
+        }
+    }
+    
+    def __init__(self):
+        self.compiled_patterns = self._compile_patterns()
+    
+    def _compile_patterns(self) -> Dict:
+        """Compile regex patterns for matching"""
+        compiled = {}
+        for lab_type, config in self.LAB_PATTERNS.items():
+            compiled[lab_type] = {
+                'regex': [re.compile(p, re.IGNORECASE) for p in config['patterns']],
+                'category': config['category'],
+                'topics': config['topics']
+            }
+        return compiled
+    
+    def is_portswigger_url(self, url: str) -> bool:
+        """Check if URL belongs to PortSwigger labs"""
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        
+        return any(
+            domain.endswith(d) or d in domain 
+            for d in self.PORTSWIGGER_DOMAINS
+        )
+    
+    def extract_lab_id(self, url: str) -> Optional[str]:
+        """
+        Extract lab ID from PortSwigger URL
+        Example: https://0a7b0010.web-security-academy.net -> 0a7b0010
+        """
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        
+        # Pattern: [alphanumeric].web-security-academy.net
+        match = re.match(r'^([a-f0-9]+)\.web-security-academy\.net$', domain)
+        if match:
+            return match.group(1)
+        
+        # Pattern: lab-[id].portswigger-labs.net
+        match = re.match(r'^lab-([a-f0-9]+)\.', domain)
+        if match:
+            return match.group(1)
+        
+        # Pattern: academy-[id].portswigger.net
+        match = re.match(r'^academy-([a-f0-9]+)\.', domain)
+        if match:
+            return match.group(1)
+        
+        # Check path for lab ID
+        path_match = re.search(r'/lab/([a-f0-9]+)', parsed.path)
+        if path_match:
+            return path_match.group(1)
+        
+        return None
+    
+    def detect_lab_type(self, url: str, html_content: Optional[str] = None) -> str:
+        """
+        Detect lab type from URL patterns and optional HTML content
+        """
+        url_lower = url.lower()
+        
+        # Check URL patterns
+        for lab_type, config in self.compiled_patterns.items():
+            for pattern in config['regex']:
+                if pattern.search(url_lower):
+                    return lab_type
+        
+        # Check HTML content if provided
+        if html_content:
+            html_lower = html_lower = html_content.lower()
+            for lab_type, config in self.compiled_patterns.items():
+                for topic in config['topics']:
+                    if topic.lower() in html_lower:
+                        return lab_type
+        
+        return 'unknown'
+    
+    def get_lab_difficulty(self, url: str) -> str:
+        """
+        Estimate lab difficulty based on URL patterns
+        """
+        # Practitioners labs are harder than apprentices
+        if 'practitioner' in url.lower():
+            return 'practitioner'
+        elif 'expert' in url.lower():
+            return 'expert'
+        return 'apprentice'
+    
+    def parse(self, url: str, html_content: Optional[str] = None) -> Optional[LabInfo]:
+        """
+        Main parsing method - returns structured lab information
+        """
+        if not self.is_portswigger_url(url):
+            return None
+        
+        lab_id = self.extract_lab_id(url)
+        if not lab_id:
+            # Try to extract from full URL as fallback
+            lab_id = 'unknown'
+        
+        lab_type = self.detect_lab_type(url, html_content)
+        difficulty = self.get_lab_difficulty(url)
+        
+        # Get category from detected type
+        category = 'Unknown'
+        if lab_type in self.compiled_patterns:
+            category = self.compiled_patterns[lab_type]['category']
+        
+        return LabInfo(
+            lab_id=lab_id,
+            lab_type=lab_type,
+            category=category,
+            difficulty=difficulty,
+            base_url=url,
+            is_portswigger=True,
+            raw_url=url
+        )
+    
+    def get_suggested_modules(self, lab_info: LabInfo) -> List[str]:
+        """
+        Get list of reconnaissance modules recommended for this lab type
+        """
+        module_mapping = {
+            'sqli': ['sqli'],
+            'xss': ['xss'],
+            'csrf': ['csrf'],
+            'auth': ['auth_bypass', 'jwt'],
+            'access_control': ['idor', 'access_control'],
+            'path_traversal': ['lfi'],
+            'ssrf': ['ssrf'],
+            'file_upload': ['file_upload'],
+            'deserialization': ['deserialization'],
+            'xxe': ['xxe'],
+            'cors': ['cors'],
+            'business_logic': ['business_logic'],
+            'info_disclosure': ['info_disclosure'],
+            'jwt': ['jwt'],
+            'race_conditions': ['race_condition'],
+            'host_header': ['host_header'],
+            'oauth': ['oauth'],
+            'graphql': ['graphql'],
+            'websockets': ['websocket'],
+            'prototype_pollution': ['prototype_pollution'],
+            'ssti': ['ssti'],
+            'request_smuggling': ['request_smuggling'],
+            'clickjacking': ['clickjacking'],
+        }
+        
+        return module_mapping.get(lab_info.lab_type, ['all'])
+
+
+class GenericLabParser:
+    """
+    Generic parser for non-PortSwigger labs (HTB, VulnHub, etc.)
+    """
+    
+    def parse(self, url: str) -> Optional[LabInfo]:
+        """
+        Basic parsing for generic targets
+        """
+        parsed = urlparse(url)
+        
+        if not parsed.netloc:
+            return None
+        
+        return LabInfo(
+            lab_id=parsed.netloc.replace('.', '_'),
+            lab_type='generic',
+            category='Unknown',
+            difficulty='unknown',
+            base_url=url,
+            is_portswigger=False,
+            raw_url=url
+        )
+
+
+class LabParser:
+    """
+    Unified lab parser that handles both PortSwigger and generic targets
+    """
+    
+    def __init__(self):
+        self.portswigger_parser = PortSwiggerLabParser()
+        self.generic_parser = GenericLabParser()
+    
+    def parse(self, url: str, html_content: Optional[str] = None) -> Optional[LabInfo]:
+        """
+        Parse any lab URL and return structured information
+        """
+        # Try PortSwigger first
+        if self.portswigger_parser.is_portswigger_url(url):
+            return self.portswigger_parser.parse(url, html_content)
+        
+        # Fall back to generic parser
+        return self.generic_parser.parse(url)
+    
+    def is_portswigger(self, url: str) -> bool:
+        """Check if URL is a PortSwigger lab"""
+        return self.portswigger_parser.is_portswigger_url(url)
+
+
+# Convenience functions
+def parse_lab_url(url: str) -> Optional[LabInfo]:
+    """Quick function to parse a lab URL"""
+    parser = LabParser()
+    return parser.parse(url)
+
+
+def get_bscp_modules() -> List[str]:
+    """
+    Return list of modules relevant for BSCP exam
+    """
+    return [
+        'sqli', 'xss', 'csrf', 'cors', 'idor',
+        'auth_bypass', 'access_control', 'oauth',
+        'file_upload', 'lfi', 'ssrf', 'xxe',
+        'jwt', 'deserialization', 'business_logic',
+        'info_disclosure', 'host_header', 'clickjacking'
+    ]
+
+
+# Example usage
+if __name__ == '__main__':
+    # Test parsing
+    test_urls = [
+        'https://0a7b0010.web-security-academy.net',
+        'https://academy-1234.portswigger.net/sql-injection',
+        'https://example.com/vulnerable-app'
+    ]
+    
+    parser = LabParser()
+    
+    for url in test_urls:
+        print(f"\nParsing: {url}")
+        info = parser.parse(url)
+        if info:
+            print(f"  Lab ID: {info.lab_id}")
+            print(f"  Type: {info.lab_type}")
+            print(f"  Category: {info.category}")
+            print(f"  Difficulty: {info.difficulty}")
+            print(f"  Is PortSwigger: {info.is_portswigger}")
+        else:
+            print("  Could not parse URL")
